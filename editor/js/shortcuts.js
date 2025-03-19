@@ -50,6 +50,24 @@ function setupKeyboardShortcuts(editor) {
         editor.trigger('keyboard', 'actions.find');
     });
 
+    // Zoom in (Ctrl+=)
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Equal, function() {
+        zoomEditor(editor, 1);
+    });
+
+    // Zoom out (Ctrl+-)
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Minus, function() {
+        zoomEditor(editor, -1);
+    });
+
+    // Reset zoom (Ctrl+0)
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit0, function() {
+        resetZoom(editor);
+    });
+
+    // Setup mouse wheel zoom separately to ensure it runs after editor is fully initialized
+    setTimeout(() => setupMouseWheelZoom(editor), 500);
+
     // Multiple cursor selection (Alt+Click)
     editor.updateOptions({
         multiCursorModifier: 'alt'
@@ -74,6 +92,10 @@ function addShortcutsInfo() {
         <p><span class="kbd">Alt+↓</span> / <span class="kbd">⌥+↓</span>: Move line down</p>
         <p><span class="kbd">Ctrl+F</span> / <span class="kbd">⌘+F</span>: Find</p>
         <p><span class="kbd">Alt+Click</span> / <span class="kbd">⌥+Click</span>: Add cursor</p>
+        <p><span class="kbd">Ctrl++</span> / <span class="kbd">⌘++</span>: Zoom in</p>
+        <p><span class="kbd">Ctrl+-</span> / <span class="kbd">⌘+-</span>: Zoom out</p>
+        <p><span class="kbd">Ctrl+0</span> / <span class="kbd">⌘+0</span>: Reset zoom</p>
+        <p><span class="kbd">Ctrl+Wheel</span> / <span class="kbd">⌘+Wheel</span>: Zoom in/out</p>
     `;
     problemContent.appendChild(shortcutInfo);
 }

@@ -1,5 +1,9 @@
 // Initialize the Monaco editor
 function initMonacoEditor() {
+
+    // Get saved font size from localStorage or use default
+    const savedFontSize = parseInt(localStorage.getItem('editor-font-size')) || 14;
+
     const editor = monaco.editor.create(document.getElementById('monaco-editor'), {
         value: `// Write your code here...`,
         language: 'cpp', // Default to C++
@@ -7,7 +11,7 @@ function initMonacoEditor() {
         automaticLayout: true,
         minimap: { enabled: true },
         scrollBeyondLastLine: false,
-        fontSize: 14,
+        fontSize :savedFontSize,
         tabSize: 2,
         lineNumbers: 'on',
         renderLineHighlight: 'all',
@@ -62,6 +66,9 @@ function initMonacoEditor() {
             cycle: true
         }
     });
+
+    // Initialize zoom status display
+    updateZoomStatus(savedFontSize);
     
     // Show cursor position in status bar
     editor.onDidChangeCursorPosition(function(e) {
