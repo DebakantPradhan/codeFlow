@@ -1,0 +1,13 @@
+.console-panel {
+    height: 150px;
+    background-color: #f5f5f5;
+    border-top: 1px solid #ddd;
+    overflow: auto;
+    padding: 10px;
+    font-family: 'Courier New', Courier, monospace;
+    display: none;
+}
+
+.console-output {
+    white-space: pre-wrap;
+}

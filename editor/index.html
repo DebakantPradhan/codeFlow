@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode Monaco Workspace</title>
+    <style>
+        /* Critical rendering styles to prevent flash */
+        html.dark-theme-html {
+            background-color: #1e1e1e;
+        }
+
+        body {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            margin: 0;
+        }
+    </style>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/editor.css">
+    <link rel="stylesheet" href="css/problem.css">
+    <link rel="stylesheet" href="css/console.css">
+</head>
+
+<body class="dark-theme">
+    <div class="app-container">
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <select id="language-select">
+                    <option value="cpp">C++</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="python">Python</option>
+                    <option value="java">Java</option>
+                </select>
+                <button id="run-button">Run Code</button>
+                <button id="save-button">Save</button>
+                <button id="console-toggle">Toggle Console</button>
+            </div>
+            <div class="toolbar-right">
+                <button id="theme-toggle">Toggle Theme</button>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="problem-panel" id="problem-statement">
+                <h1 class="problem-title">
+                    Welcome to <span style="
+                    font-family: 'Poppins', sans-serif; 
+                    font-size: 1.5rem; 
+                    font-weight: bold; 
+                    background: linear-gradient(90deg, #3ee046, #00de81); 
+                    background-clip: text;
+                    -webkit-background-clip: text; 
+                    -webkit-text-fill-color: transparent; 
+                    text-align: center; 
+                    margin: 20px 0; 
+                    letter-spacing: 2px;
+                    font-style: italic;
+                ">CodeZen Editor</span>
+                </h1>
+                <div class="problem-content">
+                    <p>Use the extension to open a LeetCode or GeeksForGeeks problem, or start coding here directly.</p>
+                    <p>The editor supports:</p>
+                    <ul>
+                        <li>Multiple programming languages</li>
+                        <li>VS Code keyboard shortcuts</li>
+                        <li>Code auto completion</li>
+                        <li>Dark/light theme toggle</li>
+                        <li>Zen mode</li>
+                    </ul>
+                    <p>Click "Run Code" to test your solution.</p>
+                </div>
+            </div>
+
+            <div class="resizer" id="resizer"></div>
+
+            <div class="editor-panel" id="monaco-editor"></div>
+        </div>
+
+        <div class="console-panel" id="console-panel">
+            <div class="console-header">
+                <h3>Console</h3>
+                <div class="console-actions">
+                    <button id="clear-console" title="Clear console">Clear</button>
+                    <button id="copy-console" title="Copy output">Copy</button>
+                </div>
+            </div>
+            <div class="console-output" id="console-output"></div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-left">
+                Ready
+            </div>
+            <div class="status-right">
+                <span id="cursor-position">Ln 1, Col 1</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monaco Editor Loader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+
+    <!-- Application JavaScript -->
+    <script src="js/editor.js"></script>
+    <script src="js/shortcuts.js"></script>
+    <script src="js/completion.js"></script>
+    <script src="js/resizer.js"></script>
+    <script src="js/console.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/loader.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>

@@ -171,7 +171,7 @@
         const encodedData = encodeURIComponent(JSON.stringify(data));
         
         // Update this URL to where your editor is hosted
-        const editorUrl = 'http://localhost:5500/editor.html';
+        const editorUrl = 'http://127.0.0.1:5500/editor/index.html';
         
         // Open in new tab
         window.open(`${editorUrl}?problem=${encodedData}`, '_blank');

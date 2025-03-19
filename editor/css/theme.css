@@ -1,0 +1,42 @@
+/* Light theme (default) */
+body {
+    background-color: #ffffff;
+    color: #333333;
+}
+
+/* Dark theme */
+.dark-theme {
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+}
+
+.dark-theme .problem-panel {
+    background-color: #252526;
+    border-right: 1px solid #333;
+}
+
+.dark-theme pre,
+.dark-theme code {
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+}
+
+.dark-theme .problem-title {
+    border-bottom: 1px solid #333;
+}
+
+.dark-theme .console-panel {
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+    border-top: 1px solid #333;
+}
+
+.dark-theme .kbd {
+    background-color: #3a3a3a;
+    border-color: #555;
+    color: #eee;
+}
+
+.dark-theme .status-bar {
+    background-color: #007acc;
+}
