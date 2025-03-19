@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode Monaco Workspace</title>
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .toolbar {
+            background-color: #333;
+            color: white;
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toolbar-left,
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toolbar button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .toolbar button:hover {
+            background-color: #45a049;
+        }
+
+        .toolbar select {
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        .main-container {
+            display: flex;
+            height: calc(100vh - 52px);
+        }
+
+        .problem-panel {
+            flex: 4;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #f5f5f5;
+            border-right: 1px solid #ddd;
+        }
+
+        .editor-panel {
+            flex: 6;
+            height: 100%;
+        }
+
+        .monaco-editor {
+            height: 100%;
+        }
+
+        .problem-title {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .problem-difficulty {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .easy {
+            background-color: #5cb85c;
+            color: white;
+        }
+
+        .medium {
+            background-color: #f0ad4e;
+            color: white;
+        }
+
+        .hard {
+            background-color: #d9534f;
+            color: white;
+        }
+
+        pre {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f0f0f0;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .resizer {
+            width: 6px;
+            cursor: col-resize;
+            background-color: #444;
+            transition: background-color 0.2s;
+        }
+
+        .resizer:hover,
+        .resizer.active {
+            background-color: #007acc;
+            /* VS Code blue */
+        }
+
+        .dark-theme {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+        }
+
+        .dark-theme .problem-panel {
+            background-color: #252526;
+            border-right: 1px solid #333;
+        }
+
+        .dark-theme pre,
+        .dark-theme code {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+        }
+
+        .dark-theme .problem-title {
+            border-bottom: 1px solid #333;
+        }
+
+        .console-panel {
+            height: 150px;
+            background-color: #f5f5f5;
+            border-top: 1px solid #ddd;
+            overflow: auto;
+            padding: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            display: none;
+        }
+
+        .dark-theme .console-panel {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            border-top: 1px solid #333;
+        }
+
+        .console-output {
+            white-space: pre-wrap;
+        }
+
+        .shortcut-info {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .kbd {
+            display: inline-block;
+            padding: 2px 5px;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+            color: #333;
+            font-family: monospace;
+            font-size: 11px;
+            margin: 0 2px;
+        }
+
+        .dark-theme .kbd {
+            background-color: #3a3a3a;
+            border-color: #555;
+            color: #eee;
+        }
+
+        .status-bar {
+            height: 22px;
+            background-color: #007acc;
+            color: white;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
+            align-items: center;
+        }
+
+        .dark-theme .status-bar {
+            background-color: #007acc;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <select id="language-select">
+                    <option value="javascript">JavaScript</option>
+                    <option value="python">Python</option>
+                    <option value="java">Java</option>
+                    <option value="cpp">C++</option>
+                </select>
+                <button id="run-button">Run Code</button>
+                <button id="save-button">Save</button>
+                <button id="console-toggle">Toggle Console</button>
+            </div>
+            <div class="toolbar-right">
+                <button id="theme-toggle">Toggle Theme</button>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="problem-panel" id="problem-statement">
+                <h1 class="problem-title">
+                    Two Sum
+                    <span class="problem-difficulty easy">Easy</span>
+                </h1>
+                <div class="problem-content">
+                    <p>Given an array of integers <code>nums</code> and an integer <code>target</code>, return
+                        <em>indices of the two numbers such that they add up to <code>target</code></em>.
+                    </p>
+                    <p>You may assume that each input would have <strong>exactly one solution</strong>, and you may not
+                        use the same element twice.</p>
+                    <p>You can return the answer in any order.</p>
+
+                    <p><strong>Example 1:</strong></p>
+                    <pre><code>Input: nums = [2,7,11,15], target = 9
+Output: [0,1]
+Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].</code></pre>
+
+                    <p><strong>Example 2:</strong></p>
+                    <pre><code>Input: nums = [3,2,4], target = 6
+Output: [1,2]</code></pre>
+
+                    <p><strong>Example 3:</strong></p>
+                    <pre><code>Input: nums = [3,3], target = 6
+Output: [0,1]</code></pre>
+
+                    <p><strong>Constraints:</strong></p>
+                    <ul>
+                        <li><code>2 <= nums.length <= 10<sup>4</sup></code></li>
+                        <li><code>-10<sup>9</sup> <= nums[i] <= 10<sup>9</sup></code></li>
+                        <li><code>-10<sup>9</sup> <= target <= 10<sup>9</sup></code></li>
+                        <li><strong>Only one valid answer exists.</strong></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="resizer" id="resizer"></div>
+
+            <div class="editor-panel" id="monaco-editor"></div>
+        </div>
+
+        <div class="console-panel" id="console-panel">
+            <div class="console-output" id="console-output"></div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-left">
+                Ready
+            </div>
+            <div class="status-right">
+                <span id="cursor-position">Ln 1, Col 1</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+    <script>
+        // Load Monaco Editor
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' } });
+        require(['vs/editor/editor.main'], function () {
+            // Editor initialization
+            const editor = monaco.editor.create(document.getElementById('monaco-editor'), {
+                value: `/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[]}
+ */
+var twoSum = function(nums, target) {
+    // Write your solution here
+    
+};`,
+                language: 'javascript',
+                theme: 'vs-dark',
+                automaticLayout: true,
+                minimap: { enabled: true },
+                scrollBeyondLastLine: false,
+                fontSize: 14,
+                tabSize: 2,
+                lineNumbers: 'on',
+                renderLineHighlight: 'all',
+                matchBrackets: 'always',
+                wordWrap: 'on',
+                autoIndent: 'full',
+                formatOnPaste: true,
+                formatOnType: true
+            });
+
+            // Process URL parameters immediately
+            const urlParams = new URLSearchParams(window.location.search);
+            const problemParam = urlParams.get('problem');
+
+            if (problemParam) {
+                try {
+                    const problemData = JSON.parse(decodeURIComponent(problemParam));
+
+                    // Define loadProblem function first if it doesn't exist yet
+                    if (!window.loadProblem) {
+                        window.loadProblem = function (data) {
+                            if (!data) return;
+
+                            // Update problem title and difficulty
+                            if (data.title) {
+                                const titleElem = document.querySelector('.problem-title');
+                                titleElem.innerHTML = data.title;
+
+                                if (data.difficulty) {
+                                    const diffClass = data.difficulty.toLowerCase();
+                                    titleElem.innerHTML += `<span class="problem-difficulty ${diffClass}">${data.difficulty}</span>`;
+                                }
+                            }
+
+                            // Update problem content
+                            if (data.description) {
+                                const contentElem = document.querySelector('.problem-content');
+
+                                // Save shortcut info if it exists
+                                let shortcutInfo = document.querySelector('.shortcut-info');
+
+                                // Replace content
+                                contentElem.innerHTML = data.description;
+
+                                // If shortcut info exists, append it back
+                                if (shortcutInfo) {
+                                    contentElem.appendChild(shortcutInfo);
+                                }
+                            }
+
+                            // Update starter code
+                            if (data.starterCode) {
+                                editor.setValue(data.starterCode);
+                            }
+
+                            // Update language if provided
+                            if (data.language) {
+                                const langSelect = document.getElementById('language-select');
+                                if (langSelect.querySelector(`option[value="${data.language}"]`)) {
+                                    langSelect.value = data.language;
+                                    monaco.editor.setModelLanguage(editor.getModel(), data.language);
+                                }
+                            }
+                        };
+                    }
+
+                    // Load the problem data
+                    window.loadProblem(problemData);
+                    console.log('Problem data loaded from URL parameters');
+                } catch (error) {
+                    console.error('Error processing problem data from URL:', error);
+                }
+            }
+
+            // Extract problem data from URL on page load
+            document.addEventListener('DOMContentLoaded', function () {
+                const urlParams = new URLSearchParams(window.location.search);
+                const problemParam = urlParams.get('problem');
+
+                if (problemParam) {
+                    try {
+                        const problemData = JSON.parse(decodeURIComponent(problemParam));
+                        window.loadProblem(problemData);
+                    } catch (error) {
+                        console.error('Error loading problem data:', error);
+                    }
+                }
+            });
+
+
+            // Function to load problem from external source (for browser extension)
+            window.loadProblem = function (data) {
+                if (!data) return;
+
+                // Update problem title and difficulty
+                if (data.title) {
+                    const titleElem = document.querySelector('.problem-title');
+                    titleElem.innerHTML = data.title;
+
+                    if (data.difficulty) {
+                        const diffClass = data.difficulty.toLowerCase();
+                        titleElem.innerHTML += `<span class="problem-difficulty ${diffClass}">${data.difficulty}</span>`;
+                    }
+                }
+
+                // Update problem content
+                if (data.description) {
+                    const contentElem = document.querySelector('.problem-content');
+                    // Remove shortcut info before replacing content
+                    const shortcutInfo = document.querySelector('.shortcut-info');
+                    contentElem.innerHTML = data.description;
+                    contentElem.appendChild(shortcutInfo);
+                }
+
+                // Update starter code
+                if (data.starterCode) {
+                    editor.setValue(data.starterCode);
+                }
+
+                // Update language if provided
+                if (data.language) {
+                    const langSelect = document.getElementById('language-select');
+                    if (langSelect.querySelector(`option[value="${data.language}"]`)) {
+                        langSelect.value = data.language;
+                        monaco.editor.setModelLanguage(editor.getModel(), data.language);
+                    }
+                }
+            };
+
+            // Add VS Code keyboard shortcuts
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, function () {
+                document.getElementById('save-button').click();
+            });
+
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyB, function () {
+                document.getElementById('run-button').click();
+            });
+
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyB, function () {
+                document.getElementById('console-toggle').click();
+            });
+
+            // Toggle comment keyboard shortcut (Ctrl+/)
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Slash, function () {
+                editor.trigger('keyboard', 'editor.action.commentLine');
+            });
+
+            // Format document (Alt+Shift+F)
+            editor.addCommand(monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KeyF, function () {
+                editor.trigger('keyboard', 'editor.action.formatDocument');
+            });
+
+            // Duplicate line (Ctrl+D)
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyD, function () {
+                editor.trigger('keyboard', 'editor.action.copyLinesDownAction');
+            });
+
+            // Delete line (Ctrl+Shift+K)
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyK, function () {
+                editor.trigger('keyboard', 'editor.action.deleteLines');
+            });
+
+            // Move line up (Alt+Up)
+            editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.UpArrow, function () {
+                editor.trigger('keyboard', 'editor.action.moveLinesUpAction');
+            });
+
+            // Move line down (Alt+Down)
+            editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.DownArrow, function () {
+                editor.trigger('keyboard', 'editor.action.moveLinesDownAction');
+            });
+
+            // Find (Ctrl+F)
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyF, function () {
+                editor.trigger('keyboard', 'actions.find');
+            });
+
+            // Multiple cursor selection (Alt+Click)
+            editor.updateOptions({
+                multiCursorModifier: 'alt'
+            });
+
+            // Show cursor position in status bar
+            editor.onDidChangeCursorPosition(function (e) {
+                const position = editor.getPosition();
+                document.getElementById('cursor-position').textContent = `Ln ${position.lineNumber}, Col ${position.column}`;
+            });
+
+            // Language selection
+            document.getElementById('language-select').addEventListener('change', function (e) {
+                const language = e.target.value;
+                monaco.editor.setModelLanguage(editor.getModel(), language);
+
+                // Change starter code based on language
+                let starterCode = '';
+                switch (language) {
+                    case 'python':
+                        starterCode = `class Solution:
+    def twoSum(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: List[int]
+        """
+        # Write your solution here
+        `;
+                        break;
+                    case 'java':
+                        starterCode = `class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        // Write your solution here
+        
+    }
+}`;
+                        break;
+                    case 'cpp':
+                        starterCode = `class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        // Write your solution here
+        
+    }
+};`;
+                        break;
+                    default: // javascript
+                        starterCode = `/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[]}
+ */
+var twoSum = function(nums, target) {
+    // Write your solution here
+    
+};`;
+                }
+
+                editor.setValue(starterCode);
+            });
+
+            // Theme toggle
+            let isDarkTheme = true;
+            document.getElementById('theme-toggle').addEventListener('click', function () {
+                isDarkTheme = !isDarkTheme;
+                monaco.editor.setTheme(isDarkTheme ? 'vs-dark' : 'vs');
+                document.body.classList.toggle('dark-theme', isDarkTheme);
+            });
+
+            // Console panel toggle
+            let isConsoleVisible = false;
+            const consolePanel = document.getElementById('console-panel');
+            document.getElementById('console-toggle').addEventListener('click', function () {
+                isConsoleVisible = !isConsoleVisible;
+                consolePanel.style.display = isConsoleVisible ? 'block' : 'none';
+
+                // Adjust editor height
+                const mainContainer = document.querySelector('.main-container');
+                mainContainer.style.height = isConsoleVisible ? 'calc(100vh - 202px)' : 'calc(100vh - 52px)';
+            });
+
+            // Run button
+            document.getElementById('run-button').addEventListener('click', function () {
+                const code = editor.getValue();
+                const language = document.getElementById('language-select').value;
+                const consoleOutput = document.getElementById('console-output');
+
+                // Make console visible if it's not
+                if (!isConsoleVisible) {
+                    document.getElementById('console-toggle').click();
+                }
+
+                // Clear previous output
+                consoleOutput.innerHTML = '';
+
+                try {
+                    if (language === 'javascript') {
+                        // Create a test case
+                        const testCode = `
+                            ${code}
+                            
+                            // Test cases
+                            const testCases = [
+                                { nums: [2, 7, 11, 15], target: 9, expected: [0, 1] },
+                                { nums: [3, 2, 4], target: 6, expected: [1, 2] },
+                                { nums: [3, 3], target: 6, expected: [0, 1] }
+                            ];
+                            
+                            for (let i = 0; i < testCases.length; i++) {
+                                const { nums, target, expected } = testCases[i];
+                                const result = twoSum(nums, target);
+                                console.log(\`Test case \${i + 1}:\`);
+                                console.log(\`  Input: nums = [\${nums}], target = \${target}\`);
+                                console.log(\`  Output: [\${result}]\`);
+                                console.log(\`  Expected: [\${expected}]\`);
+                                console.log(\`  Status: \${JSON.stringify(result) === JSON.stringify(expected) ? 'PASSED' : 'FAILED'}\`);
+                                console.log('---');
+                            }
+                        `;
+
+                        // Override console.log
+                        const originalConsoleLog = console.log;
+                        console.log = function () {
+                            const args = Array.from(arguments);
+                            consoleOutput.innerHTML += args.join(' ') + '\n';
+                            originalConsoleLog.apply(console, args);
+                        };
+
+                        // Run the code
+                        eval(testCode);
+
+                        // Restore console.log
+                        console.log = originalConsoleLog;
+                    } else {
+                        consoleOutput.innerHTML = `Running ${language} code is not supported in this demo.\nIn a full implementation, this would be sent to a server for execution.`;
+                    }
+                } catch (error) {
+                    consoleOutput.innerHTML += `Error: ${error.message}\n`;
+                    console.error('Error executing code:', error);
+                }
+            });
+
+            // Save button
+            document.getElementById('save-button').addEventListener('click', function () {
+                const code = editor.getValue();
+                const language = document.getElementById('language-select').value;
+                const fileExtensions = {
+                    'javascript': 'js',
+                    'python': 'py',
+                    'java': 'java',
+                    'cpp': 'cpp'
+                };
+
+                const blob = new Blob([code], { type: 'text/plain' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `twoSum.${fileExtensions[language] || 'txt'}`;
+                a.click();
+            });
+
+            // Implement the resizer for adjusting panel width
+            const resizer = document.getElementById('resizer');
+            const problemPanel = document.getElementById('problem-statement');
+            let isResizing = false;
+
+            resizer.addEventListener('mousedown', function (e) {
+                isResizing = true;
+                document.body.style.cursor = 'col-resize';
+                resizer.classList.add('active');
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', function (e) {
+                if (!isResizing) return;
+
+                const mainContainer = document.querySelector('.main-container');
+                const containerRect = mainContainer.getBoundingClientRect();
+                const containerWidth = containerRect.width;
+                const newWidth = e.clientX - containerRect.left;
+                const percentWidth = (newWidth / containerWidth) * 100;
+
+                // Limit min and max width with smoother constraints
+                if (percentWidth >= 20 && percentWidth <= 80) {
+                    problemPanel.style.flex = `0 0 ${percentWidth}%`;
+                    // Force layout recalculation for smoother resizing
+                    editor.layout();
+                }
+            });
+
+            document.addEventListener('mouseup', function () {
+                if (isResizing) {
+                    isResizing = false;
+                    document.body.style.cursor = '';
+                    resizer.classList.remove('active');
+                    // Trigger layout update for editor
+                    editor.layout();
+                }
+            });
+
+            // Add keyboard shortcuts info to the problem panel
+            const problemContent = document.querySelector('.problem-content');
+            const shortcutInfo = document.createElement('div');
+            shortcutInfo.className = 'shortcut-info';
+            shortcutInfo.innerHTML = `
+                <h3>VS Code Shortcuts:</h3>
+                <p><span class="kbd">Ctrl+S</span> / <span class="kbd">⌘+S</span>: Save code</p>
+                <p><span class="kbd">Ctrl+B</span> / <span class="kbd">⌘+B</span>: Run code</p>
+                <p><span class="kbd">Ctrl+Shift+B</span> / <span class="kbd">⌘+Shift+B</span>: Toggle console</p>
+                <p><span class="kbd">Ctrl+/</span> / <span class="kbd">⌘+/</span>: Toggle comment</p>
+                <p><span class="kbd">Alt+Shift+F</span> / <span class="kbd">⌥+Shift+F</span>: Format code</p>
+                <p><span class="kbd">Ctrl+D</span> / <span class="kbd">⌘+D</span>: Duplicate line</p>
+                <p><span class="kbd">Ctrl+Shift+K</span> / <span class="kbd">⌘+Shift+K</span>: Delete line</p>
+                <p><span class="kbd">Alt+↑</span> / <span class="kbd">⌥+↑</span>: Move line up</p>
+                <p><span class="kbd">Alt+↓</span> / <span class="kbd">⌥+↓</span>: Move line down</p>
+                <p><span class="kbd">Ctrl+F</span> / <span class="kbd">⌘+F</span>: Find</p>
+                <p><span class="kbd">Alt+Click</span> / <span class="kbd">⌥+Click</span>: Add cursor</p>
+            `;
+            problemContent.appendChild(shortcutInfo);
+
+
+
+
+
+            // Apply dark theme to body initially
+            document.body.classList.add('dark-theme');
+        });
+    </script>
+</body>
+
+</html>
