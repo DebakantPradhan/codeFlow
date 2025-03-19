@@ -69,10 +69,10 @@ function initMonacoEditor() {
         document.getElementById('cursor-position').textContent = `Ln ${position.lineNumber}, Col ${position.column}`;
     });
     
-    // Multiple cursor selection (Alt+Click)
-    editor.updateOptions({
-        multiCursorModifier: 'alt'
-    });
+    // // Multiple cursor selection (Alt+Click)
+    // editor.updateOptions({
+    //     multiCursorModifier: 'alt'
+    // });
     
     return editor;
 }

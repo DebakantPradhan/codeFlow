@@ -124,11 +124,11 @@ function getFileNameFromProblem(title) {
     return fileName;
 }
 
-// When loading a problem, update the buffer
-// Add this to the loadProblem function in loader.js
-if (data.starterCode) {
-    const cleanCode = cleanCodeFormatting(data.starterCode);
-    editor.setValue(cleanCode);
-    // Store the initial code in the language buffer
-    codeBuffers[data.language] = cleanCode;
-}
+// // When loading a problem, update the buffer
+// // Add this to the loadProblem function in loader.js
+// if (data.starterCode) {
+//     const cleanCode = cleanCodeFormatting(data.starterCode);
+//     editor.setValue(cleanCode);
+//     // Store the initial code in the language buffer
+//     codeBuffers[data.language] = cleanCode;
+// }

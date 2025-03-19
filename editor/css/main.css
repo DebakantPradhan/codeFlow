@@ -40,8 +40,33 @@ body, html {
     font-size: 14px;
 }
 
+.toolbar button svg {
+    width: 16px;
+    height: 16px;
+}
+
 .toolbar button:hover {
     background-color: #45a049;
+}
+
+/* Copy button specific styles */
+#copy-code-btn {
+    background-color: #3D3D3D; /* Different color to distinguish */
+}
+
+#copy-code-btn:hover {
+    background-color: #4A4A4A;
+}
+
+#copy-code-btn.copied {
+    background-color: #5A5A5A;
+}
+
+/* Toolbar right items spacing */
+.toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .toolbar select {

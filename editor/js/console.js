@@ -66,24 +66,57 @@ function setupRunButton(editor) {
     });
 }
 
-// Add keyboard shortcuts info to the problem panel
-function addShortcutsInfo() {
-    const problemContent = document.querySelector('.problem-content');
-    const shortcutInfo = document.createElement('div');
-    shortcutInfo.className = 'shortcut-info';
-    shortcutInfo.innerHTML = `
-        <h3>VS Code Shortcuts:</h3>
-        <p><span class="kbd">Ctrl+S</span> / <span class="kbd">⌘+S</span>: Save code</p>
-        <p><span class="kbd">Ctrl+B</span> / <span class="kbd">⌘+B</span>: Run code</p>
-        <p><span class="kbd">Ctrl+Shift+B</span> / <span class="kbd">⌘+Shift+B</span>: Toggle console</p>
-        <p><span class="kbd">Ctrl+/</span> / <span class="kbd">⌘+/</span>: Toggle comment</p>
-        <p><span class="kbd">Alt+Shift+F</span> / <span class="kbd">⌥+Shift+F</span>: Format code</p>
-        <p><span class="kbd">Ctrl+D</span> / <span class="kbd">⌘+D</span>: Duplicate line</p>
-        <p><span class="kbd">Ctrl+Shift+K</span> / <span class="kbd">⌘+Shift+K</span>: Delete line</p>
-        <p><span class="kbd">Alt+↑</span> / <span class="kbd">⌥+↑</span>: Move line up</p>
-        <p><span class="kbd">Alt+↓</span> / <span class="kbd">⌥+↓</span>: Move line down</p>
-        <p><span class="kbd">Ctrl+F</span> / <span class="kbd">⌘+F</span>: Find</p>
-        <p><span class="kbd">Alt+Click</span> / <span class="kbd">⌥+Click</span>: Add cursor</p>
-    `;
-    problemContent.appendChild(shortcutInfo);
+// Add this to your console.js file
+
+// Setup copy console output button
+function setupCopyConsoleButton() {
+    const copyConsoleBtn = document.getElementById('copy-console');
+    if (!copyConsoleBtn) return;
+    
+    copyConsoleBtn.addEventListener('click', function() {
+        const consoleOutput = document.getElementById('console-output');
+        const text = consoleOutput.innerText;
+        
+        copyToClipboard(text);
+        
+        // Show feedback
+        const originalText = this.innerText;
+        this.innerText = "Copied!";
+        setTimeout(() => {
+            this.innerText = originalText;
+        }, 2000);
+    });
 }
+
+// Setup clear console button
+function setupClearConsoleButton() {
+    const clearConsoleBtn = document.getElementById('clear-console');
+    if (!clearConsoleBtn) return;
+    
+    clearConsoleBtn.addEventListener('click', function() {
+        const consoleOutput = document.getElementById('console-output');
+        consoleOutput.innerHTML = '';
+    });
+}
+
+// // Add keyboard shortcuts info to the problem panel
+// function addShortcutsInfo() {
+//     const problemContent = document.querySelector('.problem-content');
+//     const shortcutInfo = document.createElement('div');
+//     shortcutInfo.className = 'shortcut-info';
+//     shortcutInfo.innerHTML = `
+//         <h3>VS Code Shortcuts:</h3>
+//         <p><span class="kbd">Ctrl+S</span> / <span class="kbd">⌘+S</span>: Save code</p>
+//         <p><span class="kbd">Ctrl+B</span> / <span class="kbd">⌘+B</span>: Run code</p>
+//         <p><span class="kbd">Ctrl+Shift+B</span> / <span class="kbd">⌘+Shift+B</span>: Toggle console</p>
+//         <p><span class="kbd">Ctrl+/</span> / <span class="kbd">⌘+/</span>: Toggle comment</p>
+//         <p><span class="kbd">Alt+Shift+F</span> / <span class="kbd">⌥+Shift+F</span>: Format code</p>
+//         <p><span class="kbd">Ctrl+D</span> / <span class="kbd">⌘+D</span>: Duplicate line</p>
+//         <p><span class="kbd">Ctrl+Shift+K</span> / <span class="kbd">⌘+Shift+K</span>: Delete line</p>
+//         <p><span class="kbd">Alt+↑</span> / <span class="kbd">⌥+↑</span>: Move line up</p>
+//         <p><span class="kbd">Alt+↓</span> / <span class="kbd">⌥+↓</span>: Move line down</p>
+//         <p><span class="kbd">Ctrl+F</span> / <span class="kbd">⌘+F</span>: Find</p>
+//         <p><span class="kbd">Alt+Click</span> / <span class="kbd">⌥+Click</span>: Add cursor</p>
+//     `;
+//     problemContent.appendChild(shortcutInfo);
+// }

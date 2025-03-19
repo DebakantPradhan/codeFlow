@@ -26,6 +26,15 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Add keyboard shortcuts info to the problem panel
         addShortcutsInfo();
+
+        // Setup copy button functionality
+        setupCopyButton(editor);
+
+        // Setup copy in console
+        setupCopyConsoleButton();
+        
+        // Setup clear in console
+        setupClearConsoleButton();
         
         // Apply dark theme by default
         // document.body.classList.add('dark-theme');
