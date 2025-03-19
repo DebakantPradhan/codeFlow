@@ -228,10 +228,10 @@
         <div class="toolbar">
             <div class="toolbar-left">
                 <select id="language-select">
+                    <option value="cpp">C++</option>
                     <option value="javascript">JavaScript</option>
                     <option value="python">Python</option>
                     <option value="java">Java</option>
-                    <option value="cpp">C++</option>
                 </select>
                 <button id="run-button">Run Code</button>
                 <button id="save-button">Save</button>
@@ -245,37 +245,19 @@
         <div class="main-container">
             <div class="problem-panel" id="problem-statement">
                 <h1 class="problem-title">
-                    Two Sum
-                    <span class="problem-difficulty easy">Easy</span>
+                    Welcome to DSA Editor
                 </h1>
                 <div class="problem-content">
-                    <p>Given an array of integers <code>nums</code> and an integer <code>target</code>, return
-                        <em>indices of the two numbers such that they add up to <code>target</code></em>.
-                    </p>
-                    <p>You may assume that each input would have <strong>exactly one solution</strong>, and you may not
-                        use the same element twice.</p>
-                    <p>You can return the answer in any order.</p>
-
-                    <p><strong>Example 1:</strong></p>
-                    <pre><code>Input: nums = [2,7,11,15], target = 9
-Output: [0,1]
-Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].</code></pre>
-
-                    <p><strong>Example 2:</strong></p>
-                    <pre><code>Input: nums = [3,2,4], target = 6
-Output: [1,2]</code></pre>
-
-                    <p><strong>Example 3:</strong></p>
-                    <pre><code>Input: nums = [3,3], target = 6
-Output: [0,1]</code></pre>
-
-                    <p><strong>Constraints:</strong></p>
+                    <p>Use the extension to open a LeetCode or GeeksForGeeks problem, or start coding here directly.</p>
+                    <p>The editor supports:</p>
                     <ul>
-                        <li><code>2 <= nums.length <= 10<sup>4</sup></code></li>
-                        <li><code>-10<sup>9</sup> <= nums[i] <= 10<sup>9</sup></code></li>
-                        <li><code>-10<sup>9</sup> <= target <= 10<sup>9</sup></code></li>
-                        <li><strong>Only one valid answer exists.</strong></li>
+                        <li>Multiple programming languages</li>
+                        <li>VS Code keyboard shortcuts</li>
+                        <li>Code auto completion</li>
+                        <li>Dark/light theme toggle</li>
+                        <li>Console output</li>
                     </ul>
+                    <p>Click "Run Code" to test your solution.</p>
                 </div>
             </div>
 
@@ -305,16 +287,8 @@ Output: [0,1]</code></pre>
         require(['vs/editor/editor.main'], function () {
             // Editor initialization
             const editor = monaco.editor.create(document.getElementById('monaco-editor'), {
-                value: `/**
- * @param {number[]} nums
- * @param {number} target
- * @return {number[]}
- */
-var twoSum = function(nums, target) {
-    // Write your solution here
-    
-};`,
-                language: 'javascript',
+                value: `// Write your code here...`,
+                language: 'cpp', // Default to C++
                 theme: 'vs-dark',
                 automaticLayout: true,
                 minimap: { enabled: true },
@@ -327,7 +301,8 @@ var twoSum = function(nums, target) {
                 wordWrap: 'on',
                 autoIndent: 'full',
                 formatOnPaste: true,
-                formatOnType: true
+                formatOnType: true,
+                renderWhitespace: 'none' // This prevents the yellow boxes
             });
 
             // Process URL parameters immediately
@@ -517,43 +492,43 @@ var twoSum = function(nums, target) {
                 let starterCode = '';
                 switch (language) {
                     case 'python':
-                        starterCode = `class Solution:
-    def twoSum(self, nums, target):
-        """
-        :type nums: List[int]
-        :type target: int
-        :rtype: List[int]
-        """
-        # Write your solution here
-        `;
+                        starterCode = `# Python solution
+def solution():
+    // Write your code here
+    pass
+
+# Test your solution
+if __name__ == "__main__":
+    solution()`;
                         break;
                     case 'java':
-                        starterCode = `class Solution {
-    public int[] twoSum(int[] nums, int target) {
-        // Write your solution here
-        
+                        starterCode = `// Java solution
+public class Solution {
+    public static void main(String[] args) {
+        // Write your code here
     }
 }`;
                         break;
                     case 'cpp':
-                        starterCode = `class Solution {
-public:
-    vector<int> twoSum(vector<int>& nums, int target) {
-        // Write your solution here
-        
-    }
-};`;
+                        starterCode = `// C++ solution
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    // Write your code here
+    
+    return 0;
+}`;
                         break;
                     default: // javascript
-                        starterCode = `/**
- * @param {number[]} nums
- * @param {number} target
- * @return {number[]}
- */
-var twoSum = function(nums, target) {
-    // Write your solution here
-    
-};`;
+                        starterCode = `// JavaScript solution
+function solution() {
+    // Write your code here
+}
+
+// Test your solution
+solution();`;
                 }
 
                 editor.setValue(starterCode);
@@ -595,29 +570,6 @@ var twoSum = function(nums, target) {
 
                 try {
                     if (language === 'javascript') {
-                        // Create a test case
-                        const testCode = `
-                            ${code}
-                            
-                            // Test cases
-                            const testCases = [
-                                { nums: [2, 7, 11, 15], target: 9, expected: [0, 1] },
-                                { nums: [3, 2, 4], target: 6, expected: [1, 2] },
-                                { nums: [3, 3], target: 6, expected: [0, 1] }
-                            ];
-                            
-                            for (let i = 0; i < testCases.length; i++) {
-                                const { nums, target, expected } = testCases[i];
-                                const result = twoSum(nums, target);
-                                console.log(\`Test case \${i + 1}:\`);
-                                console.log(\`  Input: nums = [\${nums}], target = \${target}\`);
-                                console.log(\`  Output: [\${result}]\`);
-                                console.log(\`  Expected: [\${expected}]\`);
-                                console.log(\`  Status: \${JSON.stringify(result) === JSON.stringify(expected) ? 'PASSED' : 'FAILED'}\`);
-                                console.log('---');
-                            }
-                        `;
-
                         // Override console.log
                         const originalConsoleLog = console.log;
                         console.log = function () {
@@ -627,12 +579,13 @@ var twoSum = function(nums, target) {
                         };
 
                         // Run the code
-                        eval(testCode);
+                        eval(code);
 
                         // Restore console.log
                         console.log = originalConsoleLog;
                     } else {
-                        consoleOutput.innerHTML = `Running ${language} code is not supported in this demo.\nIn a full implementation, this would be sent to a server for execution.`;
+                        consoleOutput.innerHTML = `Running ${language} code is not supported in this browser environment.\n`;
+                        consoleOutput.innerHTML += `In a full implementation, this would be sent to a server for execution.`;
                     }
                 } catch (error) {
                     consoleOutput.innerHTML += `Error: ${error.message}\n`;
@@ -706,7 +659,7 @@ var twoSum = function(nums, target) {
                 <p><span class="kbd">Ctrl+S</span> / <span class="kbd">⌘+S</span>: Save code</p>
                 <p><span class="kbd">Ctrl+B</span> / <span class="kbd">⌘+B</span>: Run code</p>
                 <p><span class="kbd">Ctrl+Shift+B</span> / <span class="kbd">⌘+Shift+B</span>: Toggle console</p>
-                <p><span class="kbd">Ctrl+/</span> / <span class="kbd">⌘+/</span>: Toggle comment</p>
+                <p><span class="kbd">Ctrl+/</span> / <span class="kbd">⌘+/span>: Toggle comment</p>
                 <p><span class="kbd">Alt+Shift+F</span> / <span class="kbd">⌥+Shift+F</span>: Format code</p>
                 <p><span class="kbd">Ctrl+D</span> / <span class="kbd">⌘+D</span>: Duplicate line</p>
                 <p><span class="kbd">Ctrl+Shift+K</span> / <span class="kbd">⌘+Shift+K</span>: Delete line</p>
