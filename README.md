@@ -1,9 +1,9 @@
-# DSA Editor - Browser Extension Documentation
+# CodeZen Editor - Browser Extension Documentation
 
-![DSA Editor Logo](./assets/icon-128.png)
+![CodeZen Editor Logo](./assets/icon-128.png)
 
 ## Overview
-DSA Editor is a browser extension and web-based code editor designed to enhance your experience while solving data structures and algorithms problems from platforms like **LeetCode** and **GeeksForGeeks**. It provides a **VS Code-like** environment to write and test your solutions.
+CodeZen Editor is a browser extension and web-based code editor designed to enhance your experience while solving data structures and algorithms problems from platforms like **LeetCode** and **GeeksForGeeks**. It provides a **VS Code-like** environment to write and test your solutions.
 
 ## Features
 - **One-Click Problem Transfer**: Open problems from LeetCode or GeeksForGeeks directly in a customized editor.
