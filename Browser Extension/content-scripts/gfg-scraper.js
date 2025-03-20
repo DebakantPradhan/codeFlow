@@ -405,10 +405,10 @@
         // For local development
         const localEditorUrl = 'http://127.0.0.1:5500/editor/index.html';
         // For production - update this to your actual hosted URL
-        const productionEditorUrl = 'https://yourdomain.com/editor/index.html';
+        const productionEditorUrl = 'codezen-editor.vercel.app';
         
         // Choose URL based on environment
-        const editorUrl = localEditorUrl;
+        const editorUrl = productionEditorUrl;
         
         // Open in new tab
         window.open(`${editorUrl}?problem=${encodedData}`, '_blank');
