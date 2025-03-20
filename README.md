@@ -23,7 +23,7 @@ CodeZen Editor is a browser extension and web-based code editor designed to enha
 
 ## Installation
 ### **Manual Installation (Chrome & Edge)**
-1. Download the extension from **[GitHub Releases](#)**.
+1. Download the extension from **[GitHub Releases](https://github.com/DebakantPradhan/codeFlow/releases/latest)**.
 2. Unzip the downloaded file.
 3. Open Chrome and navigate to `chrome://extensions/`.
 4. Enable **Developer mode** using the toggle in the top-right corner.
