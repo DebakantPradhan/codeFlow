@@ -79,8 +79,6 @@
             
             // Get mapped language or default to javascript
             const editorLanguage = languageMap[language] || 'cpp';
-
-            console.log("here is the language ", editorLanguage);
             
             // Extract starter code and clean it up
             const codeEditor = document.querySelector('.view-lines');
@@ -103,18 +101,21 @@
                     .replace(/\u200B/g, '');  // Remove zero-width spaces
             }
             
+            // Include the problem URL for the "Back to Problem" button
+            const problemURL = window.location.href;
 
-            //create problemData object
+            // Create problem data object
             const problemData = {
                 title: title,
                 problemNumber: problemNumber,
                 difficulty: difficulty,
                 description: description,
                 starterCode: starterCode,
-                language: editorLanguage
+                language: editorLanguage,
+                url: problemURL
             };
-            console.log(problemData);
             
+            console.log("Scraped LeetCode problem:", problemData);
             return problemData;
         } catch (error) {
             console.error('Error scraping LeetCode problem:', error);
@@ -132,7 +133,12 @@
         // Create button
         const button = document.createElement('button');
         button.id = 'open-vscode-editor-btn';
-        button.textContent = 'Open in VS Code Editor';
+        button.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 5px;">
+                <path d="M14.25 1.25L8.51 7l-3.01-2.25-4 3v5l4-3 3.01 2.25 5.74-5.75v-5z" fill="currentColor"/>
+            </svg>
+            Open in VS Code Editor
+        `;
         button.style.cssText = `
             background-color: #007acc;
             color: white;
@@ -143,23 +149,72 @@
             cursor: pointer;
             margin: 10px 0;
             font-size: 14px;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s;
         `;
+        
+        // Add hover effect
+        button.addEventListener('mouseover', function() {
+            this.style.backgroundColor = '#005999';
+        });
+        
+        button.addEventListener('mouseout', function() {
+            this.style.backgroundColor = '#007acc';
+        });
         
         // Find a good place to inject the button
         const targetElement = document.querySelector('.text-title-large');
         if (targetElement) {
             targetElement.parentElement.appendChild(button);
         } else {
-            // Fallback - add to top of page
-            document.body.insertBefore(button, document.body.firstChild);
+            // Try alternative locations
+            const problemHeader = document.querySelector('.flex-1');
+            if (problemHeader) {
+                // Create a container for the button to align it properly
+                const buttonContainer = document.createElement('div');
+                buttonContainer.style.cssText = 'margin-top: 10px; display: flex; justify-content: flex-end;';
+                buttonContainer.appendChild(button);
+                problemHeader.appendChild(buttonContainer);
+            } else {
+                // Fallback - add to top of page
+                document.body.insertBefore(button, document.body.firstChild);
+            }
         }
         
         // Add click event listener
         button.addEventListener('click', function() {
+            // Show loading state
+            const originalContent = this.innerHTML;
+            this.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="loading-icon" style="animation: spin 1s linear infinite; margin-right: 5px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 6v6l4 2"></path>
+                </svg>
+                Loading...
+            `;
+            
+            // Add loading animation
+            const styleElement = document.createElement('style');
+            styleElement.textContent = `
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(styleElement);
+            
+            // Extract data
             const problemData = scrapeLeetCodeProblem();
+            
             if (problemData) {
                 openInEditor(problemData);
+                // Restore button after a delay
+                setTimeout(() => {
+                    this.innerHTML = originalContent;
+                }, 1500);
             } else {
+                this.innerHTML = originalContent;
                 alert('Failed to extract problem data. Please try again.');
             }
         });
@@ -171,24 +226,53 @@
         const encodedData = encodeURIComponent(JSON.stringify(data));
         
         // Update this URL to where your editor is hosted
-        const editorUrl = 'http://127.0.0.1:5500/editor/index.html';
+        // For local development
+        const localEditorUrl = 'http://127.0.0.1:5500/editor/index.html';
+        // For production - update this to your actual hosted URL
+        const productionEditorUrl = 'https://yourdomain.com/editor/index.html';
+        
+        // Choose URL based on environment
+        const editorUrl = localEditorUrl;
         
         // Open in new tab
         window.open(`${editorUrl}?problem=${encodedData}`, '_blank');
     }
     
+    // Monitor for language changes and update button if needed
+    function monitorLanguageChanges() {
+        // For LeetCode, listen to language change button clicks
+        const languageSwitcher = document.querySelector('button[aria-haspopup="dialog"]');
+        if (languageSwitcher) {
+            languageSwitcher.addEventListener('click', function() {
+                // Re-inject the button after a delay to ensure it's still there after language change
+                setTimeout(injectButton, 500);
+            });
+        }
+    }
+    
+    // Expose the scrapeLeetCodeProblem function globally for other scripts to access
+    window.scrapeLeetCodeProblem = scrapeLeetCodeProblem;
+    
     // Run the injection after page is fully loaded
     function init() {
         // Wait for page to be fully loaded
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', injectButton);
+            document.addEventListener('DOMContentLoaded', function() {
+                injectButton();
+                monitorLanguageChanges();
+            });
         } else {
             injectButton();
+            monitorLanguageChanges();
         }
         
         // Observe DOM changes for single-page app navigation
         const observer = new MutationObserver(function(mutations) {
-            injectButton();
+            // Check if our button still exists, if not re-inject it
+            if (!document.getElementById('open-vscode-editor-btn')) {
+                injectButton();
+                monitorLanguageChanges();
+            }
         });
         
         observer.observe(document.body, {
