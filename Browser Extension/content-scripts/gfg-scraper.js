@@ -1,28 +1,28 @@
-(function() {
+(function () {
     // Function to scrape problem data from GeeksForGeeks
     function scrapeGFGProblem() {
         try {
             // Extract title
             const titleElement = document.querySelector('.problems_header_content__title__L2cB2 h3');
             const title = titleElement ? titleElement.textContent.trim() : '';
-            
+
             // Extract difficulty
             let difficulty = 'Medium'; // Default
             const difficultyElement = document.querySelector('.problems_header_description__t_8PB strong');
             if (difficultyElement) {
                 difficulty = difficultyElement.textContent.trim();
             }
-            
+
             // Extract problem description
             const descriptionElement = document.querySelector('.problems_problem_content__Xm_eO');
             const description = descriptionElement ? descriptionElement.innerHTML : '';
-            
+
             // Extract selected language from the dropdown
             let language = 'cpp'; // Default language
             const languageDropdown = document.querySelector('.problems_language_dropdown__DgjFb .divider.text');
             if (languageDropdown) {
                 const selectedLanguage = languageDropdown.textContent.trim();
-                
+
                 // Map GFG language names to our editor's language identifiers
                 if (selectedLanguage.includes('Python')) {
                     language = 'python';
@@ -34,11 +34,11 @@
                     language = 'cpp';
                 }
             }
-            
+
             // Extract starter code
             let fullCode = '';
             let starterCode = '';
-            
+
             const codeEditor = document.querySelector('#ace-editor');
             if (codeEditor) {
                 // Find all text content in the editor
@@ -46,21 +46,21 @@
                 codeLines.forEach(line => {
                     fullCode += line.textContent + '\n';
                 });
-                
+
                 // Clean up the code
                 fullCode = fullCode
                     .replace(/\u00A0/g, ' ')  // Replace non-breaking spaces
                     .replace(/\u2003/g, '  ') // Replace em spaces
                     .replace(/\u2002/g, ' ')  // Replace en spaces
                     .replace(/\u200B/g, '');  // Remove zero-width spaces
-                
+
                 // Extract only the user's solution part by removing driver code
                 starterCode = extractUserSolutionCode(fullCode, language);
             }
-            
+
             // Include the problem URL for the "Back to Problem" button
-            const problemURL = window.location.href;
-            
+            const problemURL = window.location.href.split('?')[0];
+
             // Create problem data object
             const problemData = {
                 title: title,
@@ -70,7 +70,7 @@
                 language: language,
                 url: problemURL
             };
-            
+
             console.log("Scraped GFG problem:", problemData);
             return problemData;
         } catch (error) {
@@ -78,53 +78,53 @@
             return null;
         }
     }
-    
+
     // Function to extract only the user solution part from the full code
     function extractUserSolutionCode(fullCode, language) {
         if (!fullCode) return '';
-        
+
         // For C++
         if (language === 'cpp') {
             // Look for the class Solution or user code segment
             const driverEndPattern = /\/\/\s*\}\s*Driver Code Ends/i;
             const driverStartPattern = /\/\/\s*\{\s*Driver Code Starts/i;
-            
+
             // First find all driver code sections
             const lines = fullCode.split('\n');
             let inSolutionSection = false;
             let skipDriverSection = false;
             let userCode = [];
-            
+
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i];
-                
+
                 // Check for driver code markers
                 if (driverStartPattern.test(line)) {
                     skipDriverSection = true;
                     continue;
                 }
-                
+
                 if (driverEndPattern.test(line)) {
                     skipDriverSection = false;
                     continue;
                 }
-                
+
                 // Check for Solution class which indicates user code
                 if (line.includes('class Solution') || line.includes('struct Solution')) {
                     inSolutionSection = true;
                 }
-                
+
                 // When we're in a solution section but not in driver code, collect the lines
                 if (inSolutionSection && !skipDriverSection) {
                     userCode.push(line);
                 }
-                
+
                 // If we've seen a closing brace after Solution class, we may be exiting user code
                 if (inSolutionSection && line.trim() === '};') {
                     inSolutionSection = false;
                 }
             }
-            
+
             // If we couldn't identify the solution section, try a different approach
             if (userCode.length === 0) {
                 // Look for the function signature in a class
@@ -138,35 +138,35 @@
                     if (sectionStart !== -1 && sectionEnd !== -1 && sectionStart < sectionEnd) {
                         return fullCode.substring(sectionStart + '// } Driver Code Ends'.length, sectionEnd).trim();
                     }
-                    
+
                     // Last resort: just return the full code if we can't extract the user part
-                    return fullCode; 
+                    return fullCode;
                 }
             }
-            
+
             return userCode.join('\n');
         }
-        
+
         // For Java
         else if (language === 'java') {
             // Find the class Solution in Java
             const solutionClassPattern = /class\s+Solution\s*\{[\s\S]*?\}/;
             const match = fullCode.match(solutionClassPattern);
-            
+
             if (match) {
                 return match[0];
             }
-            
+
             // Fallback: look for a section between driver code ends and driver code starts
             let sectionStart = fullCode.indexOf('// } Driver Code Ends');
             let sectionEnd = fullCode.lastIndexOf('//{ Driver Code Starts');
             if (sectionStart !== -1 && sectionEnd !== -1 && sectionStart < sectionEnd) {
                 return fullCode.substring(sectionStart + '// } Driver Code Ends'.length, sectionEnd).trim();
             }
-            
+
             return fullCode;
         }
-        
+
         // For Python
         else if (language === 'python') {
             // Python usually has a class Solution or functions directly
@@ -174,31 +174,31 @@
             let userCode = [];
             let inSolutionSection = false;
             let inDriverCode = false;
-            
+
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i];
-                
+
                 // Check for driver code comments or markers
                 if (line.includes('Driver Code Starts')) {
                     inDriverCode = true;
                     continue;
                 }
-                
+
                 if (line.includes('Driver Code Ends')) {
                     inDriverCode = false;
                     continue;
                 }
-                
+
                 // Solutions in Python usually start with 'class Solution' or are functions
                 if (line.startsWith('class Solution') || line.startsWith('def ')) {
                     inSolutionSection = true;
                 }
-                
+
                 // Collect user code
                 if (inSolutionSection && !inDriverCode) {
                     userCode.push(line);
                 }
-                
+
                 // End of solution class
                 if (inSolutionSection && line.trim() === '' && userCode.length > 0) {
                     // Check if the next non-empty line is not indented
@@ -209,7 +209,7 @@
                     }
                 }
             }
-            
+
             // If we couldn't identify user code, return a reasonable section
             if (userCode.length === 0) {
                 // Fallback: look for a section between driver code ends and driver code starts
@@ -218,13 +218,13 @@
                 if (sectionStart !== -1 && sectionEnd !== -1 && sectionStart < sectionEnd) {
                     return fullCode.substring(sectionStart + '# } Driver Code Ends'.length, sectionEnd).trim();
                 }
-                
+
                 return fullCode;
             }
-            
+
             return userCode.join('\n');
         }
-        
+
         // For JavaScript
         else if (language === 'javascript') {
             // JavaScript typically has functions or classes
@@ -232,31 +232,31 @@
             let userCode = [];
             let inSolutionSection = false;
             let inDriverCode = false;
-            
+
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i];
-                
+
                 // Check for driver code markers
                 if (line.includes('Driver Code Starts')) {
                     inDriverCode = true;
                     continue;
                 }
-                
+
                 if (line.includes('Driver Code Ends')) {
                     inDriverCode = false;
                     continue;
                 }
-                
+
                 // Look for solution class or function
                 if (line.includes('class Solution') || line.includes('function ')) {
                     inSolutionSection = true;
                 }
-                
+
                 // Collect user code
                 if (inSolutionSection && !inDriverCode) {
                     userCode.push(line);
                 }
-                
+
                 // End of solution
                 if (inSolutionSection && line.trim() === '}' && userCode.length > 0) {
                     let j = i + 1;
@@ -267,7 +267,7 @@
                     }
                 }
             }
-            
+
             // If we couldn't identify user code, use fallback
             if (userCode.length === 0) {
                 // Fallback: look for a section between driver code ends and driver code starts
@@ -276,30 +276,30 @@
                 if (sectionStart !== -1 && sectionEnd !== -1 && sectionStart < sectionEnd) {
                     return fullCode.substring(sectionStart + '// } Driver Code Ends'.length, sectionEnd).trim();
                 }
-                
+
                 return fullCode;
             }
-            
+
             return userCode.join('\n');
         }
-        
+
         // Default fallback for any language
         let sectionStart = fullCode.indexOf('Driver Code Ends');
         let sectionEnd = fullCode.lastIndexOf('Driver Code Starts');
         if (sectionStart !== -1 && sectionEnd !== -1 && sectionStart < sectionEnd) {
             return fullCode.substring(sectionStart + 'Driver Code Ends'.length, sectionEnd).trim();
         }
-        
+
         return fullCode;
     }
-    
+
     // Function to inject "Open in VS Code Editor" button
     function injectButton() {
         // Check if button already exists
         if (document.getElementById('open-vscode-editor-btn')) {
             return;
         }
-        
+
         // Create button
         const button = document.createElement('button');
         button.id = 'open-vscode-editor-btn';
@@ -323,16 +323,16 @@
             align-items: center;
             transition: background-color 0.2s;
         `;
-        
+
         // Add hover effect
-        button.addEventListener('mouseover', function() {
+        button.addEventListener('mouseover', function () {
             this.style.backgroundColor = '#005999';
         });
-        
-        button.addEventListener('mouseout', function() {
+
+        button.addEventListener('mouseout', function () {
             this.style.backgroundColor = '#007acc';
         });
-        
+
         // Find a good place to inject the button
         const targetElement = document.querySelector('.problems_header_content__title__L2cB2');
         if (targetElement) {
@@ -357,9 +357,9 @@
                 }
             }
         }
-        
+
         // Add click event listener
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             // Show loading state
             const originalContent = this.innerHTML;
             this.innerHTML = `
@@ -369,7 +369,7 @@
                 </svg>
                 Loading...
             `;
-            
+
             // Add loading animation
             const styleElement = document.createElement('style');
             styleElement.textContent = `
@@ -379,10 +379,10 @@
                 }
             `;
             document.head.appendChild(styleElement);
-            
+
             // Extract data
             const problemData = scrapeGFGProblem();
-            
+
             if (problemData) {
                 openInEditor(problemData);
                 // Restore button after a delay
@@ -395,44 +395,95 @@
             }
         });
     }
-    
+
     // Function to open data in the editor
-    function openInEditor(data) {
+    /*function openInEditor(data) {
         // Encode problem data
         const encodedData = encodeURIComponent(JSON.stringify(data));
-        
+
         // Update this URL to where your editor is hosted
         // For local development
         const localEditorUrl = 'http://127.0.0.1:5500/editor/index.html';
         // For production - update this to your actual hosted URL
         const productionEditorUrl = 'https://codezen-editor.vercel.app';
-        
+
         // Choose URL based on environment
+        // const editorUrl = localEditorUrl;
         const editorUrl = productionEditorUrl;
-        
+
         // Open in new tab
         window.open(`${editorUrl}?problem=${encodedData}`, '_blank');
+    }*/
+
+    function openInEditor(data) {
+        try {
+            // Production URL
+            const editorUrl = 'https://codezen-editor.vercel.app';
+            const apiUrl = `${editorUrl}/api/problem`;
+
+            // Show loading state in the button or UI if needed
+
+            // Send the data to the API
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ data }),
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success && result.problemId) {
+                        // Open the editor with just the problem ID
+                        window.open(`${editorUrl}?problemId=${result.problemId}`, '_blank');
+                    } else {
+                        console.error('Failed to store problem data:', result.error);
+
+                        // Fallback to direct URL parameter for small problems
+                        const encodedData = encodeURIComponent(JSON.stringify(data));
+                        if (encodedData.length < 1500) { // Safe size for URL
+                            window.open(`${editorUrl}?problem=${encodedData}`, '_blank');
+                        } else {
+                            alert('Failed to prepare problem data. Please try again.');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error storing problem data:', error);
+
+                    // Try the direct method as fallback
+                    const encodedData = encodeURIComponent(JSON.stringify(data));
+                    if (encodedData.length < 1500) { // Safe size for URL
+                        window.open(`${editorUrl}?problem=${encodedData}`, '_blank');
+                    } else {
+                        alert('Connection error. Please try again later.');
+                    }
+                });
+        } catch (error) {
+            console.error('Error in openInEditor:', error);
+            alert('An unexpected error occurred. Please try again.');
+        }
     }
-    
+
     // Monitor for language changes and update button if needed
     function monitorLanguageChanges() {
         const languageDropdown = document.querySelector('.problems_language_dropdown__DgjFb');
         if (languageDropdown) {
-            languageDropdown.addEventListener('click', function() {
+            languageDropdown.addEventListener('click', function () {
                 // Re-inject the button after a short delay to ensure it's still there after language change
                 setTimeout(injectButton, 500);
             });
         }
     }
-    
+
     // Expose the scrapeGFGProblem function globally for other scripts to access
     window.scrapeGFGProblem = scrapeGFGProblem;
-    
+
     // Run the injection after page is fully loaded
     function init() {
         // Wait for page to be fully loaded
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 injectButton();
                 monitorLanguageChanges();
             });
@@ -440,21 +491,21 @@
             injectButton();
             monitorLanguageChanges();
         }
-        
+
         // Observe DOM changes for single-page app navigation
-        const observer = new MutationObserver(function(mutations) {
+        const observer = new MutationObserver(function (mutations) {
             // Check if our button still exists, if not re-inject it
             if (!document.getElementById('open-vscode-editor-btn')) {
                 injectButton();
                 monitorLanguageChanges();
             }
         });
-        
+
         observer.observe(document.body, {
             childList: true,
             subtree: true
         });
     }
-    
+
     init();
 })();

@@ -1,78 +1,179 @@
-// Load problem from URL parameters
 function loadProblemFromURL(editor) {
     const urlParams = new URLSearchParams(window.location.search);
     const problemParam = urlParams.get('problem');
+    const problemId = urlParams.get('problemId');
     
-    if (!problemParam) return false;
-    
-    try {
-        const problemData = JSON.parse(decodeURIComponent(problemParam));
+    // If we have a problemId, fetch from API
+    if (problemId) {
+        // Show loading state
+        showLoadingIndicator();
         
-        // Get reference to problem elements
-        const problemTitle = document.querySelector('.problem-title');
-        const problemContent = document.querySelector('.problem-content');
-        
-        // Set title
-        if (problemTitle) {
-            problemTitle.innerHTML = problemData.title || 'Untitled Problem';
-            problemTitle.style.visibility = 'visible'; // Make it visible again
-        }
-        
-        // Set description with proper formatting
-        if (problemContent && problemData.description) {
-            problemContent.innerHTML = problemData.description;
-            problemContent.style.visibility = 'visible'; // Make it visible again
+        // Fetch problem data from API
+        fetch(`/api/problem?id=${problemId}`)
+            .then(response => response.json())
+            .then(result => {
+                if (result.success && result.data) {
+                    // Render the problem data
+                    renderProblem(editor, result.data);
+                } else {
+                    // Handle error
+                    showErrorMessage(result.error || 'Failed to load problem data');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching problem data:', error);
+                showErrorMessage('Error fetching problem data. Please try again.');
+            });
             
-            // Style code blocks in the description
-            highlightCodeBlocks();
+        return true;
+    }
+    
+    // If no problemId but we have a problemParam, try direct approach
+    if (problemParam) {
+        try {
+            const problemData = JSON.parse(decodeURIComponent(problemParam));
+            renderProblem(editor, problemData);
+            return true;
+        } catch (error) {
+            console.error('Error parsing problem data from URL:', error);
+            showErrorMessage('Error parsing problem data from URL');
+            return false;
         }
-        
-        // Set language
-        if (problemData.language) {
-            const languageSelect = document.getElementById('language-select');
-            if (languageSelect) {
-                languageSelect.value = problemData.language;
-                
-                // Dispatch change event to trigger language change in Monaco
-                const event = new Event('change');
-                languageSelect.dispatchEvent(event);
+    }
+    
+    return false;
+}
+
+// Helper function to show loading indicator
+function showLoadingIndicator() {
+    const problemTitle = document.querySelector('.problem-title');
+    const problemContent = document.querySelector('.problem-content');
+    
+    if (problemTitle) {
+        problemTitle.textContent = 'Loading problem...';
+        problemTitle.style.visibility = 'visible';
+    }
+    
+    if (problemContent) {
+        problemContent.innerHTML = `
+            <div style="display: flex; justify-content: center; align-items: center; height: 200px;">
+                <div class="loading-spinner"></div>
+                <p style="margin-left: 15px;">Loading problem data...</p>
+            </div>
+        `;
+        problemContent.style.visibility = 'visible';
+    }
+    
+    // Add styling for spinner if not already added
+    if (!document.getElementById('spinner-style')) {
+        const style = document.createElement('style');
+        style.id = 'spinner-style';
+        style.textContent = `
+            .loading-spinner {
+                border: 4px solid rgba(0, 0, 0, 0.1);
+                border-top: 4px solid #007acc;
+                border-radius: 50%;
+                width: 30px;
+                height: 30px;
+                animation: spin 1s linear infinite;
             }
             
-            // Set editor language directly
-            monaco.editor.setModelLanguage(editor.getModel(), problemData.language);
-        }
-        
-        // Set code
-        if (problemData.starterCode) {
-            // Clean up the code
-            const cleanCode = problemData.starterCode
-                .replace(/\u00A0/g, ' ')  // Replace non-breaking spaces
-                .replace(/\u2003/g, '  ') // Replace em spaces
-                .replace(/\u2002/g, ' ')  // Replace en spaces
-                .replace(/\u2007/g, ' ')  // Replace figure space
-                .replace(/\u2001/g, ' ')  // Replace em quad space
-                .replace(/\u2000/g, ' ')  // Replace en quad space
-                .replace(/\u200B/g, '');  // Remove zero-width spaces
-            
-            editor.setValue(cleanCode);
-            
-            // After setting value, move cursor to a good starting position
-            positionCursorAtStartingPoint(editor, cleanCode, problemData.language);
-        }
-        
-        // Add "Back to Problem" button if URL is provided
-        if (problemData.url) {
-            addBackToProblemButton(problemData.url);
-        }
-        
-        // Mark this problem as loaded from URL
-        window.problemLoadedFromURL = true;
-        
-        return true;
-    } catch (error) {
-        console.error('Error parsing problem data from URL:', error);
-        return false;
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
     }
+}
+
+// Helper function to show error message
+function showErrorMessage(message) {
+    const problemTitle = document.querySelector('.problem-title');
+    const problemContent = document.querySelector('.problem-content');
+    
+    if (problemTitle) {
+        problemTitle.textContent = 'Error';
+        problemTitle.style.visibility = 'visible';
+    }
+    
+    if (problemContent) {
+        problemContent.innerHTML = `
+            <div style="padding: 20px; background-color: #ffdddd; color: #aa0000; border-radius: 4px;">
+                <h3>Error Loading Problem</h3>
+                <p>${message}</p>
+                <p>Please try opening the problem again from the original website.</p>
+            </div>
+        `;
+        problemContent.style.visibility = 'visible';
+    }
+}
+
+// Function to render problem data
+function renderProblem(editor, problemData) {
+    // Get reference to problem elements
+    const problemTitle = document.querySelector('.problem-title');
+    const problemContent = document.querySelector('.problem-content');
+    
+    // Set title
+    if (problemTitle) {
+        let titleText = problemData.title || 'Untitled Problem';
+        if (problemData.problemNumber) {
+            titleText = problemData.problemNumber + '. ' + titleText;
+        }
+        problemTitle.innerHTML = titleText;
+        problemTitle.style.visibility = 'visible';
+    }
+    
+    // Set description with proper formatting
+    if (problemContent && problemData.description) {
+        problemContent.innerHTML = problemData.description;
+        problemContent.style.visibility = 'visible';
+        
+        // Style code blocks in the description
+        highlightCodeBlocks();
+    }
+    
+    // Set language
+    if (problemData.language) {
+        const languageSelect = document.getElementById('language-select');
+        if (languageSelect) {
+            languageSelect.value = problemData.language;
+            
+            // Dispatch change event to trigger language change in Monaco
+            const event = new Event('change');
+            languageSelect.dispatchEvent(event);
+        }
+        
+        // Set editor language directly
+        monaco.editor.setModelLanguage(editor.getModel(), problemData.language);
+    }
+    
+    // Set code
+    if (problemData.starterCode) {
+        // Clean up the code
+        const cleanCode = problemData.starterCode
+            .replace(/\u00A0/g, ' ')  // Replace non-breaking spaces
+            .replace(/\u2003/g, '  ') // Replace em spaces
+            .replace(/\u2002/g, ' ')  // Replace en spaces
+            .replace(/\u2007/g, ' ')  // Replace figure space
+            .replace(/\u2001/g, ' ')  // Replace em quad space
+            .replace(/\u2000/g, ' ')  // Replace en quad space
+            .replace(/\u200B/g, '');  // Remove zero-width spaces
+        
+        editor.setValue(cleanCode);
+        
+        // After setting value, move cursor to a good starting position
+        positionCursorAtStartingPoint(editor, cleanCode, problemData.language);
+    }
+    
+    // Add "Back to Problem" button if URL is provided
+    if (problemData.url) {
+        addBackToProblemButton(problemData.url);
+    }
+    
+    // Mark this problem as loaded from URL
+    window.problemLoadedFromURL = true;
 }
 
 function highlightCodeBlocks() {

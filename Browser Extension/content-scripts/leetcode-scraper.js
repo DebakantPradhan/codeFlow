@@ -102,7 +102,7 @@
             }
             
             // Include the problem URL for the "Back to Problem" button
-            const problemURL = window.location.href;
+            const problemURL = window.location.href.split('?')[0];
 
             // Create problem data object
             const problemData = {
@@ -221,7 +221,7 @@
     }
     
     // Function to open data in the editor
-    function openInEditor(data) {
+    /*function openInEditor(data) {
         // Encode problem data
         const encodedData = encodeURIComponent(JSON.stringify(data));
         
@@ -232,10 +232,59 @@
         const productionEditorUrl = 'https://codezen-editor.vercel.app';
         
         // Choose URL based on environment
+        // const editorUrl = localEditorUrl;
         const editorUrl = productionEditorUrl;
         
         // Open in new tab
         window.open(`${editorUrl}?problem=${encodedData}`, '_blank');
+    } */
+    
+    function openInEditor(data) {
+        try {
+            // Production URL
+            const editorUrl = 'https://codezen-editor.vercel.app';
+            const apiUrl = `${editorUrl}/api/problem`;
+
+            // Send the data to the API
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ data }),
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success && result.problemId) {
+                        // Open the editor with just the problem ID
+                        window.open(`${editorUrl}?problemId=${result.problemId}`, '_blank');
+                    } else {
+                        console.error('Failed to store problem data:', result.error);
+
+                        // Fallback to direct URL parameter for small problems
+                        const encodedData = encodeURIComponent(JSON.stringify(data));
+                        if (encodedData.length < 1500) { // Safe size for URL
+                            window.open(`${editorUrl}?problem=${encodedData}`, '_blank');
+                        } else {
+                            alert('Failed to prepare problem data. Please try again.');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error storing problem data:', error);
+
+                    // Try the direct method as fallback
+                    const encodedData = encodeURIComponent(JSON.stringify(data));
+                    if (encodedData.length < 1500) { // Safe size for URL
+                        window.open(`${editorUrl}?problem=${encodedData}`, '_blank');
+                    } else {
+                        alert('Connection error. Please try again later.');
+                    }
+                });
+        } catch (error) {
+            console.error('Error in openInEditor:', error);
+            alert('An unexpected error occurred. Please try again.');
+        }
     }
     
     // Monitor for language changes and update button if needed
