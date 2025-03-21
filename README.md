@@ -154,12 +154,9 @@ We welcome your feedback and contributions to make DSA Editor better:
 - **Feature Requests**: Let us know what would make the editor more useful.
 - **Code Contributions**: Submit pull requests to help improve functionality.
 
----
+## License & Usage  
+This project is **free to use, modify, and distribute**. Attribution is appreciated but not required.  
 
-## License
-This project is open-source, but no specific license has been applied.  
-You may view, modify and distribute the code.
----
 
 ## Acknowledgements
 - **Monaco Editor** - The code editor that powers VS Code.
