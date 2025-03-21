@@ -1,5 +1,14 @@
 {
     "version": 2,
+    "functions": {
+      "api/**/*.js": {
+        "memory": 1024,
+        "maxDuration": 10
+      }
+    },
+    "rewrites": [
+      { "source": "/api/:path*", "destination": "/api/:path*" }
+    ],
     "headers": [
       {
         "source": "/api/(.*)",
@@ -10,21 +19,5 @@
           { "key": "Access-Control-Max-Age", "value": "86400" }
         ]
       }
-    ],
-    "routes": [
-      {
-        "src": "/api/(.*)",
-        "methods": ["OPTIONS"],
-        "status": 200,
-        "dest": "/api/$1"
-      },
-      { "handle": "filesystem" },
-      { "src": "/api/(.*)", "dest": "/api/$1" }
-    ],
-    "functions": {
-      "api/**/*.js": {
-        "memory": 1024,
-        "maxDuration": 10
-      }
-    }
+    ]
   }
