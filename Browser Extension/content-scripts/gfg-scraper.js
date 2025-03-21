@@ -429,6 +429,7 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                mode: 'cors', 
                 body: JSON.stringify({ data }),
             })
                 .then(response => response.json())
@@ -453,7 +454,7 @@
 
                     // Try the direct method as fallback
                     const encodedData = encodeURIComponent(JSON.stringify(data));
-                    if (encodedData.length < 1500) { // Safe size for URL
+                    if (encodedData.length < 7800) { // Safe size for URL
                         window.open(`${editorUrl}?problem=${encodedData}`, '_blank');
                     } else {
                         alert('Connection error. Please try again later.');
