@@ -118,9 +118,9 @@ function renderProblem(editor, problemData) {
     // Set title
     if (problemTitle) {
         let titleText = problemData.title || 'Untitled Problem';
-        if (problemData.problemNumber) {
-            titleText = problemData.problemNumber + '. ' + titleText;
-        }
+        // if (problemData.problemNumber) {
+        //     titleText = problemData.problemNumber + '. ' + titleText;
+        // }
         problemTitle.innerHTML = titleText;
         problemTitle.style.visibility = 'visible';
     }
