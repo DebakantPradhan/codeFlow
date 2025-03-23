@@ -778,4 +778,11 @@ function setupCompletionProviders() {
             return { suggestions: suggestions };
         }
     });
+
+    // Use the C++ advanced completion from the separate file
+    if (typeof CppAdvancedAutocompletion !== 'undefined') {
+        CppAdvancedAutocompletion.setupCppAdvancedCompletion(monaco);
+    } else {
+        console.warn('C++ Advanced Autocompletion module not loaded');
+    }
 }
