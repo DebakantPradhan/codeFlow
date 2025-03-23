@@ -34,6 +34,13 @@ function setupCompletionProviders() {
                     documentation: 'If-else statement'
                 },
                 {
+                    label: 'elseif',
+                    kind: monaco.languages.CompletionItemKind.Snippet,
+                    insertText: 'else if (${1:condition}) {\n\t${2}\n}',
+                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                    documentation: 'else if statement'
+                },
+                {
                     label: 'for',
                     kind: monaco.languages.CompletionItemKind.Snippet,
                     insertText: 'for (let ${1:i} = 0; ${1:i} < ${2:array}.length; ${1:i}++) {\n\t${3}\n}',
@@ -221,6 +228,13 @@ function setupCompletionProviders() {
                     insertText: 'if ${1:condition}:\n\t${2:pass}\nelse:\n\t${3:pass}',
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     documentation: 'If-else statement'
+                },
+                {
+                    label: 'elseif',
+                    kind: monaco.languages.CompletionItemKind.Snippet,
+                    insertText: 'elif ${1:condition}:\n\t${2:pass}',
+                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                    documentation: 'elif statement (Python else if)'
                 },
                 {
                     label: 'class',
@@ -416,6 +430,14 @@ function setupCompletionProviders() {
                     insertText: 'if (${1:condition}) {\n\t${2}\n} else {\n\t${3}\n}',
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     documentation: 'If-else statement'
+                },
+                // Add this to your existing C++ suggestions array in completion.js
+                {
+                    label: 'elseif',
+                    kind: monaco.languages.CompletionItemKind.Snippet,
+                    insertText: 'else if (${1:condition}) {\n\t${2}\n}',
+                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                    documentation: 'else if statement'
                 },
                 {
                     label: 'vector',
@@ -659,6 +681,13 @@ function setupCompletionProviders() {
                     insertText: 'if (${1:condition}) {\n\t${2}\n} else {\n\t${3}\n}',
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     documentation: 'If-else statement'
+                },
+                {
+                    label: 'elseif',
+                    kind: monaco.languages.CompletionItemKind.Snippet,
+                    insertText: 'else if (${1:condition}) {\n\t${2}\n}',
+                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                    documentation: 'else if statement'
                 },
                 {
                     label: 'try',
