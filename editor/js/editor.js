@@ -12,7 +12,7 @@ function initMonacoEditor() {
         minimap: { enabled: true },
         scrollBeyondLastLine: false,
         fontSize :savedFontSize,
-        tabSize: 2,
+        tabSize: 4,
         lineNumbers: 'on',
         renderLineHighlight: 'all',
         matchBrackets: 'always',
