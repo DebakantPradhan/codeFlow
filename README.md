@@ -5,6 +5,9 @@
 ## Overview
 CodeZen Editor is a browser extension and web-based code editor designed to enhance your experience while solving data structures and algorithms problems from platforms like **LeetCode** and **GeeksForGeeks**. It provides a **VS Code-like** environment to write and test your solutions.
 
+watch the demo:
+https://x.com/higgsboson09/status/1904133211510259775
+
 ## Features
 - **One-Click Problem Transfer**: Open problems from LeetCode or GeeksForGeeks directly in a customized editor.
 - **VS Code-Like Interface**: Familiar coding environment powered by Monaco Editor.
