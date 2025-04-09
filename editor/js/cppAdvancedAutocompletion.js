@@ -111,20 +111,30 @@ const CppAdvancedAutocompletion = (function() {
                 // Standard context-aware suggestions
                 // Extract variables, functions and classes
                 
-                // C++ variable declarations (with types)
-                const variableRegex = /\b(?:int|float|double|char|bool|string|auto|long|unsigned|short|void|size_t|vector<[^>]*>|map<[^>]*>|set<[^>]*>|queue<[^>]*>|stack<[^>]*>|deque<[^>]*>|list<[^>]*>|array<[^>]*>|pair<[^>]*>|unique_ptr<[^>]*>|shared_ptr<[^>]*>|const\s+\w+)\s+(\w+)(?!\s*\()/g;
+                // C++ variable declarations (with types) - UPDATED to handle multiple variables in a declaration
+                const variableRegex = /\b(?:int|float|double|char|bool|string|auto|long|unsigned|short|void|size_t|vector<[^>]*>|map<[^>]*>|set<[^>]*>|queue<[^>]*>|stack<[^>]*>|deque<[^>]*>|list<[^>]*>|array<[^>]*>|pair<[^>]*>|unique_ptr<[^>]*>|shared_ptr<[^>]*>|const\s+\w+)\s+([^;(){}]*?)(?=;|$)/g;
                 
                 let match;
                 while ((match = variableRegex.exec(textUntilPosition)) !== null) {
-                    const varName = match[1];
-                    if (!varName.match(/^(if|else|for|while|switch|return|break|continue|case|default)$/)) {
-                        suggestions.push({
-                            label: varName,
-                            kind: monaco.languages.CompletionItemKind.Variable,
-                            detail: 'Variable',
-                            insertText: varName,
-                            sortText: '03' + varName,
-                        });
+                    const varDeclarationText = match[1]; // Contains all variable declarations
+                    
+                    // Process each variable in the declaration separately
+                    const varParts = varDeclarationText.split(',');
+                    for (const part of varParts) {
+                        // Extract the variable name
+                        const varNameMatch = part.trim().match(/(\w+)(?:\s*=\s*[^,]*)?$/);
+                        if (varNameMatch) {
+                            const varName = varNameMatch[1];
+                            if (!varName.match(/^(if|else|for|while|switch|return|break|continue|case|default)$/)) {
+                                suggestions.push({
+                                    label: varName,
+                                    kind: monaco.languages.CompletionItemKind.Variable,
+                                    detail: 'Variable',
+                                    insertText: varName,
+                                    sortText: '03' + varName,
+                                });
+                            }
+                        }
                     }
                 }
                 
